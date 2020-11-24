@@ -1,0 +1,10 @@
+version: '3.7'
+
+services:
+  fitcalendar_api:
+    container_name: fitcalendar_api
+    build:
+      context: .
+      dockerfile: dockerfile
+    ports:
+      - '3001:3001'
