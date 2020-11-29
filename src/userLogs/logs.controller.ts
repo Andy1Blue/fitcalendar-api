@@ -1,15 +1,7 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Headers,
-  Get,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Post, Body, Headers, Get, Param, Delete } from '@nestjs/common';
 import { LogsService } from './logs.service';
 
-// tslint:disable-next-line: no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 
 @Controller('logs')
@@ -60,11 +52,7 @@ export class LogsController {
   }
 
   @Delete('/user/:userId/id/:id')
-  async removeLog(
-    @Param('userId') userId: string,
-    @Param('id') id: string,
-    @Headers() headers,
-  ) {
+  async removeLog(@Param('userId') userId: string, @Param('id') id: string, @Headers() headers) {
     if (headers.key === process.env.SECRET_KEY) {
       await this.logsService.deleteLog({ userId, id });
       return null;

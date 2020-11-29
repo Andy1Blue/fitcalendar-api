@@ -1,29 +1,20 @@
-import { Controller, Get, Param, BadRequestException, Body, Post } from '@nestjs/common';
-import { WhitelistsService } from 'src/whitelists/whitelists.service';
+import { Controller, BadRequestException, Post } from '@nestjs/common';
+import { Body } from '@nestjs/common/decorators/http/route-params.decorator';
 import { OAuthService } from './oauth.service';
 
-// tslint:disable-next-line: no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 
 @Controller('oauth')
 export class OAuthController {
-  constructor(
-    private readonly oauthService: OAuthService,
-    private readonly whitelistsService: WhitelistsService,
-  ) {}
+  constructor(private readonly oauthService: OAuthService) {}
 
   @Post()
-  async verifyToken(@Body('token') token: string, @Body('userId') userId: string) {
-    const currentDate = Date.now() * 1000;
-    const payload = await this.oauthService.verifyToken(token, userId);
-    const isWhitelisted = await this.whitelistsService.isWhitelisted(userId);
+  async verifyToken(@Body('token') token: string) {
+    const payload = await this.oauthService.verifyToken(token);
 
-    if (!payload || !isWhitelisted) {
-      throw new BadRequestException('No authorisation');
-    }
-
-    if (currentDate < payload?.payload?.exp) {
-      throw new BadRequestException('Access token expired');
+    if (!payload.isVerified) {
+      throw new BadRequestException('No authentication');
     }
 
     return payload;

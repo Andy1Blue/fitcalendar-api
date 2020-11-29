@@ -10,66 +10,70 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { TrainingsService } from './trainings.service';
-import { WhitelistsService } from '../whitelists/whitelists.service';
 import { IHeader } from './interfaces/header.interface';
 import { OAuthService } from '../oauth/oauth.service';
 import { IOAuth } from 'src/oauth/interfaces/oauth.interface';
+import { Points, Source, Sport } from './interfaces/training.interface';
+import { Put } from '@nestjs/common/decorators/http/request-mapping.decorator';
 
-// tslint:disable-next-line: no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 
 @Controller('trainings')
 export class TrainingsController {
   constructor(
     private readonly trainingsService: TrainingsService,
-    private readonly whitelistsService: WhitelistsService,
     private readonly oauthService: OAuthService,
   ) {}
 
   isUserAuthorization = async (headers: IHeader): Promise<boolean> => {
-    const isWhitelisted: boolean = await this.whitelistsService.isWhitelisted(
-      headers.userid,
-    );
+    const token: IOAuth = await this.oauthService.verifyToken(headers.token);
 
-    const token: IOAuth = await this.oauthService.verifyToken(
-      headers.token,
-      headers.userid,
-    );
-
-    if (
-      token.isVerified &&
-      isWhitelisted &&
-      headers.userid &&
-      headers.key
-    ) {
+    if (token.isVerified) {
       return true;
     } else {
       return false;
     }
   };
 
-  @Post()
+  @Post('/user/')
   async addTraining(
-    @Body('trainingDate') trainingDate: string,
-    @Body('colorTag') colorTag: string,
+    @Body('userEmail') user_email: string,
+    @Body('sport') sport: Sport,
+    @Body('tagColor') tag_color: string | null,
+    @Body('source') source: Source | null,
+    @Body('startTime') start_time: string | null,
+    @Body('endTime') end_time: string | null,
+    @Body('durationSec') duration_sec: number,
+    @Body('distanceKm') distance_km: number,
+    @Body('caloriesKcal') calories_kcal: number,
     @Body('description') description: string,
-    @Body('distance') distance: number | null,
-    @Body('calories') calories: number | null,
-    @Body('time') time: number | null,
-    @Body('userId') userId: string,
-    @Body('type') type: string,
+    @Body('heartRateAvgBpm') heart_rate_avg_bpm: number,
+    @Body('heartRateMaxBpm') heart_rate_max_bpm: number,
+    @Body('speedAvgKmh') speed_avg_kmh: number,
+    @Body('speedMaxKmh') speed_max_kmh: number,
+    @Body('points') points: Points[],
     @Headers() headers: IHeader,
   ) {
-    if (await this.isUserAuthorization(headers)) {
+    const response = await this.oauthService.verifyToken(headers.token);
+
+    if (response.isVerified) {
       const generatedId = await this.trainingsService.insertTraining({
-        trainingDate,
-        colorTag,
+        user_email,
+        sport,
+        tag_color,
+        source,
+        start_time,
+        end_time,
+        duration_sec,
+        distance_km,
+        calories_kcal,
         description,
-        distance,
-        calories,
-        time,
-        userId,
-        type,
+        heart_rate_avg_bpm,
+        heart_rate_max_bpm,
+        speed_avg_kmh,
+        speed_max_kmh,
+        points,
       });
       return { id: generatedId };
     } else {
@@ -77,37 +81,83 @@ export class TrainingsController {
     }
   }
 
-  @Get()
-  async getAllTranings(@Headers() headers: IHeader) {
-    if (await this.isUserAuthorization(headers)) {
-      const allTrainings = await this.trainingsService.getTranings();
-      return allTrainings;
-    } else {
-      throw new BadRequestException('No authorisation');
-    }
-  }
-
-  @Get('/user/:userId')
-  async getTranings(@Param('userId') userId: string, @Headers() headers) {
-    if (await this.isUserAuthorization(headers)) {
-      const userTranings = await this.trainingsService.getTrainingsForUser({
-        userId,
-      });
-      return userTranings;
-    } else {
-      throw new BadRequestException('No authorisation');
-    }
-  }
-
-  @Get('/user/:userId/id/:id')
-  async getTraning(
+  @Put('/user/id/:id')
+  async updateTraining(
     @Param('id') id: string,
-    @Param('userId') userId: string,
+    @Body('userEmail') user_email: string,
+    @Body('sport') sport: Sport,
+    @Body('tagColor') tag_color: string | null,
+    @Body('source') source: Source | null,
+    @Body('startTime') start_time: string | null,
+    @Body('endTime') end_time: string | null,
+    @Body('durationSec') duration_sec: number,
+    @Body('distanceKm') distance_km: number,
+    @Body('caloriesKcal') calories_kcal: number,
+    @Body('description') description: string,
+    @Body('heartRateAvgBpm') heart_rate_avg_bpm: number,
+    @Body('heartRateMaxBpm') heart_rate_max_bpm: number,
+    @Body('speedAvgKmh') speed_avg_kmh: number,
+    @Body('speedMaxKmh') speed_max_kmh: number,
+    @Body('points') points: Points[],
     @Headers() headers: IHeader,
   ) {
     if (await this.isUserAuthorization(headers)) {
+      await this.trainingsService.updateTraining({
+        user_email,
+        sport,
+        tag_color,
+        source,
+        start_time,
+        end_time,
+        duration_sec,
+        distance_km,
+        calories_kcal,
+        description,
+        heart_rate_avg_bpm,
+        heart_rate_max_bpm,
+        speed_avg_kmh,
+        speed_max_kmh,
+        points,
+      });
+      return id;
+    } else {
+      throw new BadRequestException('No authorisation');
+    }
+  }
+
+  @Delete('/user/id/:id')
+  async removeTraining(@Param('id') id: string, @Headers() headers: IHeader) {
+    const response = await this.oauthService.verifyToken(headers.token);
+
+    if (response.isVerified) {
+      await this.trainingsService.deleteTraining({ user_email: response.payload.email, id });
+      return id;
+    } else {
+      throw new BadRequestException('No authorisation');
+    }
+  }
+
+  @Get('/user/')
+  async getTranings(@Headers() headers: IHeader) {
+    const response = await this.oauthService.verifyToken(headers.token);
+
+    if (response.isVerified) {
+      const userTranings = await this.trainingsService.getTrainingsForUser({
+        user_email: response.payload.email,
+      });
+      return userTranings;
+    } else {
+      throw new BadRequestException('No authentication');
+    }
+  }
+
+  @Get('/user/id/:id')
+  async getTraning(@Param('id') id: string, @Headers() headers: IHeader) {
+    const response = await this.oauthService.verifyToken(headers.token);
+
+    if (response.isVerified) {
       const training = await this.trainingsService.getSingleTraining({
-        userId,
+        user_email: response.payload.email,
         id,
       });
       return training;
@@ -116,15 +166,13 @@ export class TrainingsController {
     }
   }
 
-  @Get('/first/user/:userId')
-  async getFirstTraning(
-    @Param('id') traningId: string,
-    @Param('userId') userId: string,
-    @Headers() headers: IHeader,
-  ) {
-    if (await this.isUserAuthorization(headers)) {
+  @Get('/user/first/')
+  async getFirstTraning(@Headers() headers: IHeader) {
+    const response = await this.oauthService.verifyToken(headers.token);
+
+    if (response.isVerified) {
       const training = await this.trainingsService.getFirstTrainingForUser({
-        userId,
+        user_email: response.payload.email,
       });
       return training;
     } else {
@@ -132,15 +180,13 @@ export class TrainingsController {
     }
   }
 
-  @Get('/last/user/:userId')
-  async getLastTraning(
-    @Param('id') traningId: string,
-    @Param('userId') userId: string,
-    @Headers() headers: IHeader,
-  ) {
-    if (await this.isUserAuthorization(headers)) {
+  @Get('/user/last/')
+  async getLastTraning(@Headers() headers: IHeader) {
+    const response = await this.oauthService.verifyToken(headers.token);
+
+    if (response.isVerified) {
       const training = await this.trainingsService.getLastTrainingForUser({
-        userId,
+        user_email: response.payload.email,
       });
       return training;
     } else {
@@ -148,66 +194,59 @@ export class TrainingsController {
     }
   }
 
-  @Get('/calories/user/:userId/year/:year')
+  @Get('/user/calories/year/:year')
   async getTheLargestAmountOfCalories(
     @Param('userId') userId: string,
     @Param('year') year: string,
     @Headers() headers: IHeader,
   ) {
-    if (await this.isUserAuthorization(headers)) {
-      const training = await this.trainingsService.getTheLargestAmountOfCaloriesForUser(
-        year,
-        { userId },
-      );
+    const response = await this.oauthService.verifyToken(headers.token);
+
+    if (response.isVerified) {
+      const training = await this.trainingsService.getTheLargestAmountOfCaloriesForUser(year, {
+        user_email: response.payload.email,
+      });
       return training;
     } else {
       throw new BadRequestException('No authorisation');
     }
   }
 
-  @Get('/distance/user/:userId/year/:year')
-  async getTheLargestAmountOfDistance(
-    @Param('userId') userId: string,
-    @Param('year') year: string,
-    @Headers() headers: IHeader,
-  ) {
-    if (await this.isUserAuthorization(headers)) {
-      const training = await this.trainingsService.getTheLargestAmountOfDistanceForUser(
-        year,
-        { userId },
-      );
+  @Get('/user/distance/year/:year')
+  async getTheLargestAmountOfDistance(@Param('year') year: string, @Headers() headers: IHeader) {
+    const response = await this.oauthService.verifyToken(headers.token);
+
+    if (response.isVerified) {
+      const training = await this.trainingsService.getTheLargestAmountOfDistanceForUser(year, {
+        user_email: response.payload.email,
+      });
       return training;
     } else {
       throw new BadRequestException('No authorisation');
     }
   }
 
-  @Get('/time/user/:userId/year/:year')
-  async getTheLargestAmountOfTime(
-    @Param('userId') userId: string,
-    @Param('year') year: string,
-    @Headers() headers: IHeader,
-  ) {
-    if (await this.isUserAuthorization(headers)) {
-      const training = await this.trainingsService.getTheLargestAmountOfTimeForUser(
-        year,
-        { userId },
-      );
+  @Get('/user/time/year/:year')
+  async getTheLargestAmountOfTime(@Param('year') year: string, @Headers() headers: IHeader) {
+    const response = await this.oauthService.verifyToken(headers.token);
+
+    if (response.isVerified) {
+      const training = await this.trainingsService.getTheLargestAmountOfTimeForUser(year, {
+        user_email: response.payload.email,
+      });
       return training;
     } else {
       throw new BadRequestException('No authorisation');
     }
   }
 
-  @Get('/sum/user/:userId/year/:year')
-  async getSumTraningDataByYear(
-    @Param('userId') userId: string,
-    @Param('year') year: string,
-    @Headers() headers: IHeader,
-  ) {
-    if (await this.isUserAuthorization(headers)) {
+  @Get('/user/sum/year/:year')
+  async getSumTraningDataByYear(@Param('year') year: string, @Headers() headers: IHeader) {
+    const response = await this.oauthService.verifyToken(headers.token);
+
+    if (response.isVerified) {
       const result = await this.trainingsService.sumTraingsDataByYear(year, {
-        userId,
+        user_email: response.payload.email,
       });
       return result;
     } else {
@@ -215,109 +254,67 @@ export class TrainingsController {
     }
   }
 
-  @Get('/sum/user/:userId/year/:year/month/:month')
+  @Get('/user/sum/year/:year/month/:month')
   async getSumTraningDataByMonth(
-    @Param('userId') userId: string,
     @Param('year') year: string,
     @Param('month') month: string,
     @Headers() headers: IHeader,
   ) {
-    if (await this.isUserAuthorization(headers)) {
-      const result = await this.trainingsService.sumTraingsDataByMonth(
-        year,
-        month,
-        { userId },
-      );
-      return result;
-    } else {
-      throw new BadRequestException('No authorisation');
-    }
-  }
+    const response = await this.oauthService.verifyToken(headers.token);
 
-  @Patch('/user/:userId/id/:id')
-  async updateTraining(
-    @Param('userId') userId: string,
-    @Param('id') id: string,
-    @Body('colorTag') colorTag: string,
-    @Body('description') description: string,
-    @Body('distance') distance: number,
-    @Body('calories') calories: number,
-    @Body('time') time: number,
-    @Body('type') type: string,
-    @Headers() headers: IHeader,
-  ) {
-    if (await this.isUserAuthorization(headers)) {
-      await this.trainingsService.updateTraining({
-        userId,
-        id,
-        colorTag,
-        description,
-        distance,
-        calories,
-        time,
-        type,
+    if (response.isVerified) {
+      const result = await this.trainingsService.sumTraingsDataByMonth(year, month, {
+        user_email: response.payload.email,
       });
-      return null;
-    } else {
-      throw new BadRequestException('No authorisation');
-    }
-  }
-
-  @Delete('/user/:userId/id/:id')
-  async removeTraining(
-    @Param('userId') userId: string,
-    @Param('id') id: string,
-    @Headers() headers: IHeader,
-  ) {
-    if (await this.isUserAuthorization(headers)) {
-      await this.trainingsService.deleteTraining({ userId, id });
-      return null;
-    } else {
-      throw new BadRequestException('No authorisation');
-    }
-  }
-
-  @Get('/compare/user/:userId/to/:userIdToCompare/year/:year')
-  async compareSumTraingsDataByYear(
-    @Param('userId') userId: string,
-    @Param('year') year: string,
-    @Param('userIdToCompare') userIdToCompare: string,
-    @Headers() headers: IHeader,
-  ) {
-    if (await this.isUserAuthorization(headers)) {
-      const result = await this.trainingsService.compareSumTraingsDataByYear(
-        year,
-        {
-          userId,
-        },
-        userIdToCompare,
-      );
       return result;
     } else {
       throw new BadRequestException('No authorisation');
     }
   }
 
-  @Get('/compare/user/:userId/to/:userIdToCompare/year/:year/month/:month')
-  async compareSumTraingsDataByMonth(
-    @Param('userId') userId: string,
-    @Param('year') year: string,
-    @Param('month') month: string,
-    @Param('userIdToCompare') userIdToCompare: string,
-    @Headers() headers: IHeader,
-  ) {
-    if (await this.isUserAuthorization(headers)) {
-      const result = await this.trainingsService.compareSumTraingsDataByMonth(
-        month,
-        year,
-        {
-          userId,
-        },
-        userIdToCompare,
-      );
-      return result;
-    } else {
-      throw new BadRequestException('No authorisation');
-    }
-  }
+  // TODO
+  // @Get('/compare/user/:userId/to/:userIdToCompare/year/:year')
+  // async compareSumTraingsDataByYear(
+  //   @Param('userId') userId: string,
+  //   @Param('year') year: string,
+  //   @Param('userIdToCompare') userIdToCompare: string,
+  //   @Headers() headers: IHeader,
+  // ) {
+  //   if (await this.isUserAuthorization(headers)) {
+  //     const result = await this.trainingsService.compareSumTraingsDataByYear(
+  //       year,
+  //       {
+  //         userId,
+  //       },
+  //       userIdToCompare,
+  //     );
+  //     return result;
+  //   } else {
+  //     throw new BadRequestException('No authorisation');
+  //   }
+  // }
+
+  // TODO
+  // @Get('/compare/user/:userId/to/:userIdToCompare/year/:year/month/:month')
+  // async compareSumTraingsDataByMonth(
+  //   @Param('userId') userId: string,
+  //   @Param('year') year: string,
+  //   @Param('month') month: string,
+  //   @Param('userIdToCompare') userIdToCompare: string,
+  //   @Headers() headers: IHeader,
+  // ) {
+  //   if (await this.isUserAuthorization(headers)) {
+  //     const result = await this.trainingsService.compareSumTraingsDataByMonth(
+  //       month,
+  //       year,
+  //       {
+  //         userId,
+  //       },
+  //       userIdToCompare,
+  //     );
+  //     return result;
+  //   } else {
+  //     throw new BadRequestException('No authorisation');
+  //   }
+  // }
 }

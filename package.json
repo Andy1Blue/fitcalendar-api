@@ -1,7 +1,7 @@
 {
   "name": "fitcalendar-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "FitCalendar API",
   "author": "Krzysztof Bujak",
   "private": true,
   "license": "ISC",

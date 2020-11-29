@@ -7,15 +7,13 @@ import e = require('express');
 
 @Injectable()
 export class TrainingsService {
-  constructor(
-    @InjectModel('Training') private readonly trainingModel: Model<Training>,
-  ) {}
+  constructor(@InjectModel('Training') private readonly trainingModel: Model<Training>) {}
 
   private async findTraining(training: ITraining): Promise<Training> {
     let findTraining;
     try {
       findTraining = await this.trainingModel.findOne({
-        userId: training.userId,
+        user_email: training.user_email,
         _id: training.id,
       });
     } catch (error) {
@@ -30,35 +28,39 @@ export class TrainingsService {
   }
 
   async insertTraining(training: ITraining) {
-    const createdDate = new Date();
-    const lastUpdatedDateTime = createdDate;
-    const isActive = true;
+    const actualDate = new Date();
 
     const newTraining = new this.trainingModel({
-      trainingDate: training.trainingDate,
-      colorTag: training.colorTag,
+      created_date: actualDate,
+      update_date: actualDate,
+      user_email: training.user_email,
+      sport: training.sport,
+      tag_color: training.tag_color,
+      source: training.source,
+      start_time: training.start_time,
+      end_time: training.end_time,
+      duration_sec: training.duration_sec,
+      distance_km: training.distance_km,
+      calories_kcal: training.calories_kcal,
       description: training.description,
-      distance: training.distance,
-      calories: training.calories,
-      time: training.time,
-      userId: training.userId,
-      createdDate,
-      lastUpdatedDateTime,
-      isActive,
-      type: training.type,
+      heart_rate_avg_bpm: training.heart_rate_avg_bpm,
+      heart_rate_max_bpm: training.heart_rate_max_bpm,
+      speed_avg_kmh: training.speed_avg_kmh,
+      speed_max_kmh: training.speed_max_kmh,
+      points: training.points,
     });
     const result = await newTraining.save();
     return result.id as string;
   }
 
-  async getTranings() {
-    const result = await this.trainingModel.find().exec();
-    return result as Training[];
-  }
+  // async getTranings() {
+  //   const result = await this.trainingModel.find().exec();
+  //   return result as Training[];
+  // }
 
   async getTrainingsForUser(training: ITraining) {
     const trainingsForUser = await this.trainingModel.find({
-      userId: training.userId,
+      user_email: training.user_email,
     });
 
     if (!trainingsForUser) {
@@ -70,7 +72,7 @@ export class TrainingsService {
 
   async getLastTrainingForUser(training: ITraining) {
     const lastTrainingForUser = await this.trainingModel
-      .find({ userId: training.userId })
+      .find({ user_email: training.user_email })
       .sort({ createdDate: -1 })
       .limit(1);
 
@@ -83,7 +85,7 @@ export class TrainingsService {
 
   async getFirstTrainingForUser(training: ITraining) {
     const firstTrainingForUser = await this.trainingModel
-      .find({ userId: training.userId })
+      .find({ user_email: training.user_email })
       .sort({ createdDate: 1 })
       .limit(1);
 
@@ -96,7 +98,7 @@ export class TrainingsService {
 
   async getSingleTraining(training: ITraining) {
     const singleTraining = await this.findTraining({
-      userId: training.userId,
+      user_email: training.user_email,
       id: training.id,
     });
 
@@ -109,34 +111,64 @@ export class TrainingsService {
 
   async updateTraining(training: ITraining) {
     const updatedTraining = await this.findTraining({
-      userId: training.userId,
+      user_email: training.user_email,
       id: training.id,
     });
+
+    if (training.sport) {
+      updatedTraining.sport = training.sport;
+    }
+
+    if (training.tag_color) {
+      updatedTraining.tag_color = training.tag_color;
+    }
+
+    if (training.source) {
+      updatedTraining.source = training.source;
+    }
+
+    if (training.start_time) {
+      updatedTraining.start_time = training.start_time;
+    }
+
+    if (training.end_time) {
+      updatedTraining.end_time = training.end_time;
+    }
+
+    if (training.duration_sec >= 0) {
+      updatedTraining.duration_sec = training.duration_sec;
+    }
+
+    if (training.distance_km >= 0) {
+      updatedTraining.distance_km = training.distance_km;
+    }
+
+    if (training.calories_kcal >= 0) {
+      updatedTraining.calories_kcal = training.calories_kcal;
+    }
 
     if (training.description) {
       updatedTraining.description = training.description;
     }
 
-    if (training.distance >= 0) {
-      updatedTraining.distance = training.distance;
+    if (training.heart_rate_avg_bpm) {
+      updatedTraining.heart_rate_avg_bpm = training.heart_rate_avg_bpm;
     }
 
-    if (training.calories >= 0) {
-      updatedTraining.calories = training.calories;
+    if (training.heart_rate_max_bpm) {
+      updatedTraining.heart_rate_max_bpm = training.heart_rate_max_bpm;
     }
 
-    if (training.time >= 0) {
-      updatedTraining.time = training.time;
+    if (training.speed_avg_kmh) {
+      updatedTraining.speed_avg_kmh = training.speed_avg_kmh;
     }
 
-    if (training.colorTag) {
-      updatedTraining.colorTag = training.colorTag;
+    if (training.speed_max_kmh) {
+      updatedTraining.speed_max_kmh = training.speed_max_kmh;
     }
 
-    if (training.type && training.type !== '-') {
-      updatedTraining.type = training.type;
-    } else {
-      updatedTraining.type = null;
+    if (training.points) {
+      updatedTraining.points = training.points;
     }
 
     updatedTraining.save();
@@ -144,7 +176,7 @@ export class TrainingsService {
 
   async deleteTraining(training: ITraining) {
     const result = await this.trainingModel
-      .deleteOne({ userId: training.userId, _id: training.id })
+      .deleteOne({ user_email: training.user_email, _id: training.id })
       .exec();
     if (result.n === 0) {
       throw new NotFoundException('Could not find training.');
@@ -155,11 +187,11 @@ export class TrainingsService {
     const theLargestAmountOfDistance = await this.trainingModel
       .find({
         $and: [
-          { userId: training.userId },
-          { trainingDate: { $regex: year, $options: 'i' } },
+          { user_email: training.user_email },
+          { start_time: { $regex: year, $options: 'i' } },
         ],
       })
-      .sort({ distance: -1 })
+      .sort({ distance_km: -1 })
       .limit(1);
 
     if (!theLargestAmountOfDistance) {
@@ -173,11 +205,11 @@ export class TrainingsService {
     const theLargestAmountOfTime = await this.trainingModel
       .find({
         $and: [
-          { userId: training.userId },
-          { trainingDate: { $regex: year, $options: 'i' } },
+          { user_email: training.user_email },
+          { start_time: { $regex: year, $options: 'i' } },
         ],
       })
-      .sort({ time: -1 })
+      .sort({ duration_sec: -1 })
       .limit(1);
 
     if (!theLargestAmountOfTime) {
@@ -191,11 +223,11 @@ export class TrainingsService {
     const theLargestAmountOfCalories = await this.trainingModel
       .find({
         $and: [
-          { userId: training.userId },
-          { trainingDate: { $regex: year, $options: 'i' } },
+          { user_email: training.user_email },
+          { start_time: { $regex: year, $options: 'i' } },
         ],
       })
-      .sort({ calories: -1 })
+      .sort({ calories_kcal: -1 })
       .limit(1);
 
     if (!theLargestAmountOfCalories) {
@@ -211,8 +243,8 @@ export class TrainingsService {
     this.trainingModel.countDocuments(
       {
         $and: [
-          { userId: training.userId },
-          { trainingDate: { $regex: year, $options: 'i' } },
+          { user_email: training.user_email },
+          { start_time: { $regex: year, $options: 'i' } },
           { type: { $not: { $regex: /^ABSENCE.*/ } } },
         ],
       },
@@ -227,65 +259,59 @@ export class TrainingsService {
       {
         $match: {
           $and: [
-            { userId: training.userId },
-            { time: { $gte: 1 } },
-            { trainingDate: { $regex: year, $options: 'i' } },
+            { user_email: training.user_email },
+            { duration_sec: { $gte: 1 } },
+            { start_time: { $regex: year, $options: 'i' } },
           ],
         },
       },
-      { $group: { _id: null, time: { $sum: '$time' } } },
+      { $group: { _id: null, duration_sec: { $sum: '$duration_sec' } } },
     ]);
 
     const matchDistance = await this.trainingModel.aggregate([
       {
         $match: {
           $and: [
-            { userId: training.userId },
-            { distance: { $gte: 1 } },
-            { trainingDate: { $regex: year, $options: 'i' } },
+            { user_email: training.user_email },
+            { distance_km: { $gte: 1 } },
+            { start_time: { $regex: year, $options: 'i' } },
           ],
         },
       },
-      { $group: { _id: null, distance: { $sum: '$distance' } } },
+      { $group: { _id: null, distance_km: { $sum: '$distance_km' } } },
     ]);
 
     const matchCalories = await this.trainingModel.aggregate([
       {
         $match: {
           $and: [
-            { userId: training.userId },
-            { calories: { $gte: 1 } },
-            { trainingDate: { $regex: year, $options: 'i' } },
+            { user_email: training.user_email },
+            { calories_kcal: { $gte: 1 } },
+            { start_time: { $regex: year, $options: 'i' } },
           ],
         },
       },
-      { $group: { _id: null, calories: { $sum: '$calories' } } },
+      { $group: { _id: null, calories_kcal: { $sum: 'calories_kcal' } } },
     ]);
 
     return {
       0: {
-        time: matchTime && matchTime[0] ? matchTime[0].time : null,
-        distance:
-          matchTime && matchDistance[0] ? matchDistance[0].distance : null,
-        calories:
-          matchTime && matchCalories[0] ? matchCalories[0].calories : null,
+        duration_sec: matchTime && matchTime[0] ? matchTime[0].time : null,
+        distance_km: matchTime && matchDistance[0] ? matchDistance[0].distance : null,
+        calories_kcal: matchTime && matchCalories[0] ? matchCalories[0].calories : null,
       },
       count,
     };
   }
 
-  async sumTraingsDataByMonth(
-    year: string,
-    month: string,
-    training: ITraining,
-  ) {
+  async sumTraingsDataByMonth(year: string, month: string, training: ITraining) {
     let count = 0;
 
     this.trainingModel.countDocuments(
       {
         $and: [
-          { userId: training.userId },
-          { trainingDate: { $regex: month + '' + year, $options: 'i' } },
+          { user_email: training.user_email },
+          { start_time: { $regex: month + '' + year, $options: 'i' } },
           { type: { $not: { $regex: /^ABSENCE.*/ } } },
         ],
       },
@@ -300,48 +326,46 @@ export class TrainingsService {
       {
         $match: {
           $and: [
-            { userId: training.userId },
-            { time: { $gte: 1 } },
-            { trainingDate: { $regex: month + '' + year, $options: 'i' } },
+            { user_email: training.user_email },
+            { duration_sec: { $gte: 1 } },
+            { start_time: { $regex: month + '' + year, $options: 'i' } },
           ],
         },
       },
-      { $group: { _id: null, time: { $sum: '$time' } } },
+      { $group: { _id: null, duration_sec: { $sum: '$duration_sec' } } },
     ]);
 
     const matchDistance = await this.trainingModel.aggregate([
       {
         $match: {
           $and: [
-            { userId: training.userId },
-            { distance: { $gte: 1 } },
-            { trainingDate: { $regex: month + '' + year, $options: 'i' } },
+            { user_email: training.user_email },
+            { distance_km: { $gte: 1 } },
+            { start_time: { $regex: month + '' + year, $options: 'i' } },
           ],
         },
       },
-      { $group: { _id: null, distance: { $sum: '$distance' } } },
+      { $group: { _id: null, distance_km: { $sum: '$distance_km' } } },
     ]);
 
     const matchCalories = await this.trainingModel.aggregate([
       {
         $match: {
           $and: [
-            { userId: training.userId },
-            { calories: { $gte: 1 } },
-            { trainingDate: { $regex: month + '' + year, $options: 'i' } },
+            { user_email: training.user_email },
+            { calories_kcal: { $gte: 1 } },
+            { start_time: { $regex: month + '' + year, $options: 'i' } },
           ],
         },
       },
-      { $group: { _id: null, calories: { $sum: '$calories' } } },
+      { $group: { _id: null, calories_kcal: { $sum: 'calories_kcal' } } },
     ]);
 
     return {
       0: {
-        time: matchTime && matchTime[0] ? matchTime[0].time : null,
-        distance:
-          matchTime && matchDistance[0] ? matchDistance[0].distance : null,
-        calories:
-          matchTime && matchCalories[0] ? matchCalories[0].calories : null,
+        duration_sec: matchTime && matchTime[0] ? matchTime[0].time : null,
+        distance_km: matchTime && matchDistance[0] ? matchDistance[0].distance : null,
+        calories_kcal: matchTime && matchCalories[0] ? matchCalories[0].calories : null,
       },
       count,
     };
@@ -350,7 +374,7 @@ export class TrainingsService {
   async compareSumTraingsDataByYear(
     year: string,
     training: ITraining,
-    userIdToCompare: string,
+    user_emailToCompare: string,
   ) {
     let countUser = 0;
     let countUserToCompare = 0;
@@ -358,8 +382,8 @@ export class TrainingsService {
     this.trainingModel.countDocuments(
       {
         $and: [
-          { userId: training.userId },
-          { trainingDate: { $regex: year, $options: 'i' } },
+          { user_email: training.user_email },
+          { start_time: { $regex: year, $options: 'i' } },
           { type: { $not: { $regex: /^ABSENCE.*/ } } },
         ],
       },
@@ -373,8 +397,8 @@ export class TrainingsService {
     this.trainingModel.countDocuments(
       {
         $and: [
-          { userId: userIdToCompare },
-          { trainingDate: { $regex: year, $options: 'i' } },
+          { user_email: user_emailToCompare },
+          { start_time: { $regex: year, $options: 'i' } },
           { type: { $not: { $regex: /^ABSENCE.*/ } } },
         ],
       },
@@ -389,99 +413,106 @@ export class TrainingsService {
       {
         $match: {
           $and: [
-            { userId: training.userId },
-            { time: { $gte: 1 } },
-            { trainingDate: { $regex: year, $options: 'i' } },
+            { user_email: training.user_email },
+            { duration_sec: { $gte: 1 } },
+            { start_time: { $regex: year, $options: 'i' } },
           ],
         },
       },
-      { $group: { _id: null, time: { $sum: '$time' } } },
+      { $group: { _id: null, duration_sec: { $sum: '$duration_sec' } } },
     ]);
 
     const matchDistanceUser = await this.trainingModel.aggregate([
       {
         $match: {
           $and: [
-            { userId: training.userId },
-            { distance: { $gte: 1 } },
-            { trainingDate: { $regex: year, $options: 'i' } },
+            { user_email: training.user_email },
+            { distance_km: { $gte: 1 } },
+            { start_time: { $regex: year, $options: 'i' } },
           ],
         },
       },
-      { $group: { _id: null, distance: { $sum: '$distance' } } },
+      { $group: { _id: null, distance_km: { $sum: '$distance_km' } } },
     ]);
 
     const matchCaloriesUser = await this.trainingModel.aggregate([
       {
         $match: {
           $and: [
-            { userId: training.userId },
-            { calories: { $gte: 1 } },
-            { trainingDate: { $regex: year, $options: 'i' } },
+            { user_email: training.user_email },
+            { calories_kcal: { $gte: 1 } },
+            { start_time: { $regex: year, $options: 'i' } },
           ],
         },
       },
-      { $group: { _id: null, calories: { $sum: '$calories' } } },
+      { $group: { _id: null, calories_kcal: { $sum: 'calories_kcal' } } },
     ]);
 
     const matchTimeUserToCompare = await this.trainingModel.aggregate([
       {
         $match: {
           $and: [
-            { userId: userIdToCompare },
-            { time: { $gte: 1 } },
-            { trainingDate: { $regex: year, $options: 'i' } },
+            { user_email: user_emailToCompare },
+            { duration_sec: { $gte: 1 } },
+            { start_time: { $regex: year, $options: 'i' } },
           ],
         },
       },
-      { $group: { _id: null, time: { $sum: '$time' } } },
+      { $group: { _id: null, duration_sec: { $sum: '$duration_sec' } } },
     ]);
 
     const matchDistanceUserToCompare = await this.trainingModel.aggregate([
       {
         $match: {
           $and: [
-            { userId: userIdToCompare },
-            { distance: { $gte: 1 } },
-            { trainingDate: { $regex: year, $options: 'i' } },
+            { user_email: user_emailToCompare },
+            { distance_km: { $gte: 1 } },
+            { start_time: { $regex: year, $options: 'i' } },
           ],
         },
       },
-      { $group: { _id: null, distance: { $sum: '$distance' } } },
+      { $group: { _id: null, distance_km: { $sum: '$distance_km' } } },
     ]);
 
     const matchCaloriesUserToCompare = await this.trainingModel.aggregate([
       {
         $match: {
           $and: [
-            { userId: userIdToCompare },
-            { calories: { $gte: 1 } },
-            { trainingDate: { $regex: year, $options: 'i' } },
+            { user_email: user_emailToCompare },
+            { calories_kcal: { $gte: 1 } },
+            { start_time: { $regex: year, $options: 'i' } },
           ],
         },
       },
-      { $group: { _id: null, calories: { $sum: '$calories' } } },
+      { $group: { _id: null, calories_kcal: { $sum: 'calories_kcal' } } },
     ]);
 
     return {
       compare: {
         user: {
           0: {
-            time: matchTimeUser && matchTimeUser[0] ? matchTimeUser[0].time : null,
-            distance:
-            matchTimeUser && matchDistanceUser[0] ? matchDistanceUser[0].distance : null,
-            calories:
-            matchTimeUser && matchCaloriesUser[0] ? matchCaloriesUser[0].calories : null,
+            duration_sec: matchTimeUser && matchTimeUser[0] ? matchTimeUser[0].time : null,
+            distance_km:
+              matchTimeUser && matchDistanceUser[0] ? matchDistanceUser[0].distance : null,
+            calories_kcal:
+              matchTimeUser && matchCaloriesUser[0] ? matchCaloriesUser[0].calories : null,
           },
           countUser,
         },
         userToCompare: {
           0: {
-            time: matchTimeUserToCompare && matchTimeUserToCompare[0] ? matchTimeUserToCompare[0].time : null,
-            distance:
-            matchTimeUserToCompare && matchDistanceUserToCompare[0] ? matchDistanceUserToCompare[0].distance : null,
-            calories:
-            matchTimeUserToCompare && matchCaloriesUserToCompare[0] ? matchCaloriesUserToCompare[0].calories : null,
+            duration_sec:
+              matchTimeUserToCompare && matchTimeUserToCompare[0]
+                ? matchTimeUserToCompare[0].time
+                : null,
+            distance_km:
+              matchTimeUserToCompare && matchDistanceUserToCompare[0]
+                ? matchDistanceUserToCompare[0].distance
+                : null,
+            calories_kcal:
+              matchTimeUserToCompare && matchCaloriesUserToCompare[0]
+                ? matchCaloriesUserToCompare[0].calories
+                : null,
           },
           countUserToCompare,
         },
@@ -493,7 +524,7 @@ export class TrainingsService {
     month: string,
     year: string,
     training: ITraining,
-    userIdToCompare: string,
+    user_emailToCompare: string,
   ) {
     let countUser = 0;
     let countUserToCompare = 0;
@@ -501,8 +532,8 @@ export class TrainingsService {
     this.trainingModel.countDocuments(
       {
         $and: [
-          { userId: training.userId },
-          { trainingDate: { $regex: month + '' + year, $options: 'i' } },
+          { user_email: training.user_email },
+          { start_time: { $regex: month + '' + year, $options: 'i' } },
           { type: { $not: { $regex: /^ABSENCE.*/ } } },
         ],
       },
@@ -516,8 +547,8 @@ export class TrainingsService {
     this.trainingModel.countDocuments(
       {
         $and: [
-          { userId: userIdToCompare },
-          { trainingDate: { $regex: month + '' + year, $options: 'i' } },
+          { user_email: user_emailToCompare },
+          { start_time: { $regex: month + '' + year, $options: 'i' } },
           { type: { $not: { $regex: /^ABSENCE.*/ } } },
         ],
       },
@@ -532,103 +563,110 @@ export class TrainingsService {
       {
         $match: {
           $and: [
-            { userId: training.userId },
-            { time: { $gte: 1 } },
-            { trainingDate: { $regex: month + '' + year, $options: 'i' } },
+            { user_email: training.user_email },
+            { duration_sec: { $gte: 1 } },
+            { start_time: { $regex: month + '' + year, $options: 'i' } },
           ],
         },
       },
-      { $group: { _id: null, time: { $sum: '$time' } } },
+      { $group: { _id: null, duration_sec: { $sum: '$duration_sec' } } },
     ]);
 
     const matchDistanceUser = await this.trainingModel.aggregate([
       {
         $match: {
           $and: [
-            { userId: training.userId },
-            { distance: { $gte: 1 } },
-            { trainingDate: { $regex: month + '' + year, $options: 'i' } },
+            { user_email: training.user_email },
+            { distance_km: { $gte: 1 } },
+            { start_time: { $regex: month + '' + year, $options: 'i' } },
           ],
         },
       },
-      { $group: { _id: null, distance: { $sum: '$distance' } } },
+      { $group: { _id: null, distance_km: { $sum: '$distance_km' } } },
     ]);
 
     const matchCaloriesUser = await this.trainingModel.aggregate([
       {
         $match: {
           $and: [
-            { userId: training.userId },
-            { calories: { $gte: 1 } },
-            { trainingDate: { $regex: month + '' + year, $options: 'i' } },
+            { user_email: training.user_email },
+            { calories_kcal: { $gte: 1 } },
+            { start_time: { $regex: month + '' + year, $options: 'i' } },
           ],
         },
       },
-      { $group: { _id: null, calories: { $sum: '$calories' } } },
+      { $group: { _id: null, calories_kcal: { $sum: 'calories_kcal' } } },
     ]);
 
     const matchTimeUserToCompare = await this.trainingModel.aggregate([
       {
         $match: {
           $and: [
-            { userId: userIdToCompare },
-            { time: { $gte: 1 } },
-            { trainingDate: { $regex: month + '' + year, $options: 'i' } },
+            { user_email: user_emailToCompare },
+            { duration_sec: { $gte: 1 } },
+            { start_time: { $regex: month + '' + year, $options: 'i' } },
           ],
         },
       },
-      { $group: { _id: null, time: { $sum: '$time' } } },
+      { $group: { _id: null, duration_sec: { $sum: '$duration_sec' } } },
     ]);
 
     const matchDistanceUserToCompare = await this.trainingModel.aggregate([
       {
         $match: {
           $and: [
-            { userId: userIdToCompare },
-            { distance: { $gte: 1 } },
-            { trainingDate: { $regex: month + '' + year, $options: 'i' } },
+            { user_email: user_emailToCompare },
+            { distance_km: { $gte: 1 } },
+            { start_time: { $regex: month + '' + year, $options: 'i' } },
           ],
         },
       },
-      { $group: { _id: null, distance: { $sum: '$distance' } } },
+      { $group: { _id: null, distance_km: { $sum: '$distance_km' } } },
     ]);
 
     const matchCaloriesUserToCompare = await this.trainingModel.aggregate([
       {
         $match: {
           $and: [
-            { userId: userIdToCompare },
-            { calories: { $gte: 1 } },
-            { trainingDate: { $regex: month + '' + year, $options: 'i' } },
+            { user_email: user_emailToCompare },
+            { calories_kcal: { $gte: 1 } },
+            { start_time: { $regex: month + '' + year, $options: 'i' } },
           ],
         },
       },
-      { $group: { _id: null, calories: { $sum: '$calories' } } },
+      { $group: { _id: null, calories_kcal: { $sum: 'calories_kcal' } } },
     ]);
 
     return {
       compare: {
         user: {
           0: {
-            time: matchTimeUser && matchTimeUser[0] ? matchTimeUser[0].time : null,
-            distance:
-            matchTimeUser && matchDistanceUser[0] ? matchDistanceUser[0].distance : null,
-            calories:
-            matchTimeUser && matchCaloriesUser[0] ? matchCaloriesUser[0].calories : null,
+            duration_sec: matchTimeUser && matchTimeUser[0] ? matchTimeUser[0].time : null,
+            distance_km:
+              matchTimeUser && matchDistanceUser[0] ? matchDistanceUser[0].distance : null,
+            calories_kcal:
+              matchTimeUser && matchCaloriesUser[0] ? matchCaloriesUser[0].calories : null,
           },
           countUser,
         },
         userToCompare: {
           0: {
-            time: matchTimeUserToCompare && matchTimeUserToCompare[0] ? matchTimeUserToCompare[0].time : null,
-            distance:
-            matchTimeUserToCompare && matchDistanceUserToCompare[0] ? matchDistanceUserToCompare[0].distance : null,
-            calories:
-            matchTimeUserToCompare && matchCaloriesUserToCompare[0] ? matchCaloriesUserToCompare[0].calories : null,
+            duration_sec:
+              matchTimeUserToCompare && matchTimeUserToCompare[0]
+                ? matchTimeUserToCompare[0].time
+                : null,
+            distance_km:
+              matchTimeUserToCompare && matchDistanceUserToCompare[0]
+                ? matchDistanceUserToCompare[0].distance
+                : null,
+            calories_kcal:
+              matchTimeUserToCompare && matchCaloriesUserToCompare[0]
+                ? matchCaloriesUserToCompare[0].calories
+                : null,
           },
           countUserToCompare,
         },
       },
     };
   }
-  }
+}

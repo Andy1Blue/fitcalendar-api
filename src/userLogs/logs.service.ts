@@ -7,9 +7,7 @@ import e = require('express');
 
 @Injectable()
 export class LogsService {
-  constructor(
-    @InjectModel('Log') private readonly logModel: Model<Log>,
-  ) {}
+  constructor(@InjectModel('Log') private readonly logModel: Model<Log>) {}
 
   private async findLog(log: ILog): Promise<Log> {
     let findLog;
@@ -72,9 +70,7 @@ export class LogsService {
   }
 
   async deleteLog(log: ILog) {
-    const result = await this.logModel
-      .deleteOne({ userId: log.userId, _id: log.id })
-      .exec();
+    const result = await this.logModel.deleteOne({ userId: log.userId, _id: log.id }).exec();
     if (result.n === 0) {
       throw new NotFoundException('Could not find log.');
     }
