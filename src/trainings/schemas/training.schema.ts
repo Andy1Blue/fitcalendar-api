@@ -26,7 +26,7 @@ export interface Training extends mongoose.Document {
   id: string;
   user_email: string;
   sport: Sport;
-  created_date: string; // format 0000-00-00 00:00:00
+  created_date: string;
   update_date: string;
   tag_color?: string;
   source?: Source;
