@@ -196,11 +196,7 @@ export class TrainingsController {
   }
 
   @Get('/user/calories/year/:year')
-  async getTheLargestAmountOfCalories(
-    @Param('userId') userId: string,
-    @Param('year') year: string,
-    @Headers() headers: IHeader,
-  ) {
+  async getTheLargestAmountOfCalories(@Param('year') year: string, @Headers() headers: IHeader) {
     const response = await this.oauthService.verifyToken(headers.token);
 
     if (response.isVerified) {
