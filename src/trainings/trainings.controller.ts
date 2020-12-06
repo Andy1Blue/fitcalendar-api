@@ -103,6 +103,7 @@ export class TrainingsController {
   ) {
     if (await this.isUserAuthorization(headers)) {
       await this.trainingsService.updateTraining({
+        id,
         user_email,
         sport,
         tag_color,
