@@ -8,8 +8,8 @@ import e = require('express');
 export class WhitelistsService {
   constructor(@InjectModel('Whitelist') private readonly WhitelistModel: Model<Whitelist>) {}
 
-  async isWhitelisted(userId: string): Promise<boolean> {
-    const whitelistedUser = await this.WhitelistModel.findOne({ userId }).exec();
+  async isWhitelisted(email: string): Promise<boolean> {
+    const whitelistedUser = await this.WhitelistModel.findOne({ email }).exec();
 
     if (!whitelistedUser || !whitelistedUser.isActive) {
       return false;

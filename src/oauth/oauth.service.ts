@@ -36,7 +36,7 @@ export class OAuthService {
         audience: process.env.REACT_APP_GOOGLE_ID,
       });
       const payload = ticket.getPayload();
-      const isWhitelisted: boolean = await this.whitelistsService.isWhitelisted(payload.sub);
+      const isWhitelisted: boolean = await this.whitelistsService.isWhitelisted(payload.email);
       const currentDate = Date.now() * 1000;
 
       if (currentDate < payload.exp) {
