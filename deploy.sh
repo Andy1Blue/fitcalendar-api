@@ -1,4 +1,3 @@
-git fetch && 
-git pull && 
-npm run build &&
-npm run start:prod
+git fetch &&
+git pull &&
+docker-compose -f docker-compose.yml up -d --build
