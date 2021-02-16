@@ -311,7 +311,7 @@ export class TrainingsService {
       {
         $and: [
           { user_email: training.user_email },
-          { start_time: { $regex: month + '' + year, $options: 'i' } },
+          { start_time: { $regex: year + '-' + month, $options: 'i' } },
           { type: { $not: { $regex: /^ABSENCE.*/ } } },
         ],
       },
@@ -328,7 +328,7 @@ export class TrainingsService {
           $and: [
             { user_email: training.user_email },
             { duration_sec: { $gte: 1 } },
-            { start_time: { $regex: month + '' + year, $options: 'i' } },
+            { start_time: { $regex: year + '-' + month, $options: 'i' } },
           ],
         },
       },
@@ -341,7 +341,7 @@ export class TrainingsService {
           $and: [
             { user_email: training.user_email },
             { distance_km: { $gte: 1 } },
-            { start_time: { $regex: month + '' + year, $options: 'i' } },
+            { start_time: { $regex: year + '-' + month, $options: 'i' } },
           ],
         },
       },
@@ -354,7 +354,7 @@ export class TrainingsService {
           $and: [
             { user_email: training.user_email },
             { calories_kcal: { $gte: 1 } },
-            { start_time: { $regex: month + '' + year, $options: 'i' } },
+            { start_time: { $regex: year + '-' + month, $options: 'i' } },
           ],
         },
       },
