@@ -291,14 +291,14 @@ export class TrainingsService {
           ],
         },
       },
-      { $group: { _id: null, calories_kcal: { $sum: 'calories_kcal' } } },
+      { $group: { _id: null, calories_kcal: { $sum: '$calories_kcal' } } },
     ]);
 
     return {
       0: {
-        duration_sec: matchTime && matchTime[0] ? matchTime[0].time : null,
-        distance_km: matchTime && matchDistance[0] ? matchDistance[0].distance : null,
-        calories_kcal: matchTime && matchCalories[0] ? matchCalories[0].calories : null,
+        duration_sec: matchTime && matchTime[0] ? matchTime[0].duration_sec : null,
+        distance_km: matchDistance && matchDistance[0] ? matchDistance[0].distance_km : null,
+        calories_kcal: matchCalories && matchCalories[0] ? matchCalories[0].calories_kcal : null,
       },
       count,
     };
@@ -358,14 +358,14 @@ export class TrainingsService {
           ],
         },
       },
-      { $group: { _id: null, calories_kcal: { $sum: 'calories_kcal' } } },
+      { $group: { _id: null, calories_kcal: { $sum: '$calories_kcal' } } },
     ]);
 
     return {
       0: {
-        duration_sec: matchTime && matchTime[0] ? matchTime[0].time : null,
-        distance_km: matchTime && matchDistance[0] ? matchDistance[0].distance : null,
-        calories_kcal: matchTime && matchCalories[0] ? matchCalories[0].calories : null,
+        duration_sec: matchTime && matchTime[0] ? matchTime[0].duration_sec : null,
+        distance_km: matchDistance && matchDistance[0] ? matchDistance[0].distance_km : null,
+        calories_kcal: matchCalories && matchCalories[0] ? matchCalories[0].calories_kcal : null,
       },
       count,
     };
