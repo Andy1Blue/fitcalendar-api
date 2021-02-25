@@ -9,22 +9,22 @@ import e = require('express');
 export class LogsService {
   constructor(@InjectModel('Log') private readonly logModel: Model<Log>) {}
 
-  private async findLog(log: ILog): Promise<Log> {
-    let findLog;
-    try {
-      findLog = await this.logModel.findOne({
-        _id: log.id,
-      });
-    } catch (error) {
-      throw new NotFoundException('Could not find log.');
-    }
+  // private async findLog(log: ILog): Promise<Log> {
+  //   let findLog;
+  //   try {
+  //     findLog = await this.logModel.findOne({
+  //       _id: log.id,
+  //     });
+  //   } catch (error) {
+  //     throw new NotFoundException('Could not find log.');
+  //   }
 
-    if (!findLog) {
-      throw new NotFoundException('Could not find log.');
-    }
+  //   if (!findLog) {
+  //     throw new NotFoundException('Could not find log.');
+  //   }
 
-    return findLog;
-  }
+  //   return findLog;
+  // }
 
   async insertLog(log: ILog) {
     const createdDate = new Date();
@@ -36,43 +36,44 @@ export class LogsService {
       category: log.category,
     });
     const result = await newLog.save();
+
     return result.id as string;
   }
 
-  async getLogs() {
-    const result = await this.logModel.find().exec();
-    return result as Log[];
-  }
+  // async getLogs() {
+  //   const result = await this.logModel.find().exec();
+  //   return result as Log[];
+  // }
 
-  async getLogsForUser(log: ILog) {
-    const logsForUser = await this.logModel.find({
-      userId: log.userId,
-    });
+  // async getLogsForUser(log: ILog) {
+  //   const logsForUser = await this.logModel.find({
+  //     userId: log.userId,
+  //   });
 
-    if (!logsForUser) {
-      throw new NotFoundException('Could not find logs for specify user.');
-    }
+  //   if (!logsForUser) {
+  //     throw new NotFoundException('Could not find logs for specify user.');
+  //   }
 
-    return logsForUser as Log[];
-  }
+  //   return logsForUser as Log[];
+  // }
 
-  async getSingleLog(log: ILog) {
-    const singleLog = await this.findLog({
-      userId: log.userId,
-      id: log.id,
-    });
+  // async getSingleLog(log: ILog) {
+  //   const singleLog = await this.findLog({
+  //     userId: log.userId,
+  //     id: log.id,
+  //   });
 
-    if (!singleLog) {
-      throw new NotFoundException('Could not find log.');
-    }
+  //   if (!singleLog) {
+  //     throw new NotFoundException('Could not find log.');
+  //   }
 
-    return singleLog as Log;
-  }
+  //   return singleLog as Log;
+  // }
 
-  async deleteLog(log: ILog) {
-    const result = await this.logModel.deleteOne({ userId: log.userId, _id: log.id }).exec();
-    if (result.n === 0) {
-      throw new NotFoundException('Could not find log.');
-    }
-  }
+  // async deleteLog(log: ILog) {
+  //   const result = await this.logModel.deleteOne({ userId: log.userId, _id: log.id }).exec();
+  //   if (result.n === 0) {
+  //     throw new NotFoundException('Could not find log.');
+  //   }
+  // }
 }

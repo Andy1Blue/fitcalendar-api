@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { BadRequestException } from '@nestjs/common/exceptions/bad-request.exception';
 import { OAuth2Client } from 'google-auth-library';
-import { WhitelistsService } from 'src/whitelists/whitelists.service';
+import { WhitelistsService } from '../whitelists/whitelists.service';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
