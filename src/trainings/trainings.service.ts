@@ -445,7 +445,7 @@ export class TrainingsService {
           ],
         },
       },
-      { $group: { _id: null, calories_kcal: { $sum: 'calories_kcal' } } },
+      { $group: { _id: null, calories_kcal: { $sum: '$calories_kcal' } } },
     ]);
 
     const matchTimeUserToCompare = await this.trainingModel.aggregate([
@@ -484,39 +484,56 @@ export class TrainingsService {
           ],
         },
       },
-      { $group: { _id: null, calories_kcal: { $sum: 'calories_kcal' } } },
+      { $group: { _id: null, calories_kcal: { $sum: '$calories_kcal' } } },
     ]);
 
-    return {
-      compare: {
-        user: {
-          0: {
-            duration_sec: matchTimeUser && matchTimeUser[0] ? matchTimeUser[0].time : null,
-            distance_km:
-              matchTimeUser && matchDistanceUser[0] ? matchDistanceUser[0].distance : null,
-            calories_kcal:
-              matchTimeUser && matchCaloriesUser[0] ? matchCaloriesUser[0].calories : null,
-          },
-          countUser,
-        },
-        userToCompare: {
-          0: {
-            duration_sec:
-              matchTimeUserToCompare && matchTimeUserToCompare[0]
-                ? matchTimeUserToCompare[0].time
-                : null,
-            distance_km:
-              matchTimeUserToCompare && matchDistanceUserToCompare[0]
-                ? matchDistanceUserToCompare[0].distance
-                : null,
-            calories_kcal:
-              matchTimeUserToCompare && matchCaloriesUserToCompare[0]
-                ? matchCaloriesUserToCompare[0].calories
-                : null,
-          },
-          countUserToCompare,
-        },
+    const userOneData = {
+      user: training.user_email,
+      stats: {
+        duration_sec: matchTimeUser && matchTimeUser[0] ? matchTimeUser[0].duration_sec : null,
+        distance_km:
+          matchTimeUser && matchDistanceUser[0] ? matchDistanceUser[0].distance_km : null,
+        calories_kcal:
+          matchTimeUser && matchCaloriesUser[0] ? matchCaloriesUser[0].calories_kcal : null,
       },
+      count: countUser,
+    };
+
+    const userTwoData = {
+      user: user_emailToCompare,
+      stats: {
+        duration_sec:
+          matchTimeUserToCompare && matchTimeUserToCompare[0]
+            ? matchTimeUserToCompare[0].duration_sec
+            : null,
+        distance_km:
+          matchTimeUserToCompare && matchDistanceUserToCompare[0]
+            ? matchDistanceUserToCompare[0].distance_km
+            : null,
+        calories_kcal:
+          matchTimeUserToCompare && matchCaloriesUserToCompare[0]
+            ? matchCaloriesUserToCompare[0].calories_kcal
+            : null,
+      },
+      count: countUserToCompare,
+    };
+
+    const usersData = [];
+    const isUsersData =
+      userOneData.stats.duration_sec &&
+      userOneData.stats.distance_km &&
+      userOneData.stats.calories_kcal &&
+      userTwoData.stats.duration_sec &&
+      userTwoData.stats.distance_km &&
+      userTwoData.stats.calories_kcal;
+
+    if (isUsersData) {
+      usersData.push(userOneData);
+      usersData.push(userTwoData);
+    }
+
+    return {
+      compare: usersData,
     };
   }
 
@@ -533,7 +550,7 @@ export class TrainingsService {
       {
         $and: [
           { user_email: training.user_email },
-          { start_time: { $regex: month + '' + year, $options: 'i' } },
+          { start_time: { $regex: year + '-' + month, $options: 'i' } },
           { type: { $not: { $regex: /^ABSENCE.*/ } } },
         ],
       },
@@ -548,7 +565,7 @@ export class TrainingsService {
       {
         $and: [
           { user_email: user_emailToCompare },
-          { start_time: { $regex: month + '' + year, $options: 'i' } },
+          { start_time: { $regex: year + '-' + month, $options: 'i' } },
           { type: { $not: { $regex: /^ABSENCE.*/ } } },
         ],
       },
@@ -565,7 +582,7 @@ export class TrainingsService {
           $and: [
             { user_email: training.user_email },
             { duration_sec: { $gte: 1 } },
-            { start_time: { $regex: month + '' + year, $options: 'i' } },
+            { start_time: { $regex: year + '-' + month, $options: 'i' } },
           ],
         },
       },
@@ -578,7 +595,7 @@ export class TrainingsService {
           $and: [
             { user_email: training.user_email },
             { distance_km: { $gte: 1 } },
-            { start_time: { $regex: month + '' + year, $options: 'i' } },
+            { start_time: { $regex: year + '-' + month, $options: 'i' } },
           ],
         },
       },
@@ -591,11 +608,11 @@ export class TrainingsService {
           $and: [
             { user_email: training.user_email },
             { calories_kcal: { $gte: 1 } },
-            { start_time: { $regex: month + '' + year, $options: 'i' } },
+            { start_time: { $regex: year + '-' + month, $options: 'i' } },
           ],
         },
       },
-      { $group: { _id: null, calories_kcal: { $sum: 'calories_kcal' } } },
+      { $group: { _id: null, calories_kcal: { $sum: '$calories_kcal' } } },
     ]);
 
     const matchTimeUserToCompare = await this.trainingModel.aggregate([
@@ -604,7 +621,7 @@ export class TrainingsService {
           $and: [
             { user_email: user_emailToCompare },
             { duration_sec: { $gte: 1 } },
-            { start_time: { $regex: month + '' + year, $options: 'i' } },
+            { start_time: { $regex: year + '-' + month, $options: 'i' } },
           ],
         },
       },
@@ -617,7 +634,7 @@ export class TrainingsService {
           $and: [
             { user_email: user_emailToCompare },
             { distance_km: { $gte: 1 } },
-            { start_time: { $regex: month + '' + year, $options: 'i' } },
+            { start_time: { $regex: year + '-' + month, $options: 'i' } },
           ],
         },
       },
@@ -630,43 +647,60 @@ export class TrainingsService {
           $and: [
             { user_email: user_emailToCompare },
             { calories_kcal: { $gte: 1 } },
-            { start_time: { $regex: month + '' + year, $options: 'i' } },
+            { start_time: { $regex: year + '-' + month, $options: 'i' } },
           ],
         },
       },
-      { $group: { _id: null, calories_kcal: { $sum: 'calories_kcal' } } },
+      { $group: { _id: null, calories_kcal: { $sum: '$calories_kcal' } } },
     ]);
 
-    return {
-      compare: {
-        user: {
-          0: {
-            duration_sec: matchTimeUser && matchTimeUser[0] ? matchTimeUser[0].time : null,
-            distance_km:
-              matchTimeUser && matchDistanceUser[0] ? matchDistanceUser[0].distance : null,
-            calories_kcal:
-              matchTimeUser && matchCaloriesUser[0] ? matchCaloriesUser[0].calories : null,
-          },
-          countUser,
-        },
-        userToCompare: {
-          0: {
-            duration_sec:
-              matchTimeUserToCompare && matchTimeUserToCompare[0]
-                ? matchTimeUserToCompare[0].time
-                : null,
-            distance_km:
-              matchTimeUserToCompare && matchDistanceUserToCompare[0]
-                ? matchDistanceUserToCompare[0].distance
-                : null,
-            calories_kcal:
-              matchTimeUserToCompare && matchCaloriesUserToCompare[0]
-                ? matchCaloriesUserToCompare[0].calories
-                : null,
-          },
-          countUserToCompare,
-        },
+    const userOneData = {
+      user: training.user_email,
+      stats: {
+        duration_sec: matchTimeUser && matchTimeUser[0] ? matchTimeUser[0].duration_sec : null,
+        distance_km:
+          matchTimeUser && matchDistanceUser[0] ? matchDistanceUser[0].distance_km : null,
+        calories_kcal:
+          matchTimeUser && matchCaloriesUser[0] ? matchCaloriesUser[0].calories_kcal : null,
       },
+      count: countUser,
+    };
+
+    const userTwoData = {
+      user: user_emailToCompare,
+      stats: {
+        duration_sec:
+          matchTimeUserToCompare && matchTimeUserToCompare[0]
+            ? matchTimeUserToCompare[0].duration_sec
+            : null,
+        distance_km:
+          matchTimeUserToCompare && matchDistanceUserToCompare[0]
+            ? matchDistanceUserToCompare[0].distance_km
+            : null,
+        calories_kcal:
+          matchTimeUserToCompare && matchCaloriesUserToCompare[0]
+            ? matchCaloriesUserToCompare[0].calories_kcal
+            : null,
+      },
+      count: countUserToCompare,
+    };
+
+    const usersData = [];
+    const isUsersData =
+      userOneData.stats.duration_sec &&
+      userOneData.stats.distance_km &&
+      userOneData.stats.calories_kcal &&
+      userTwoData.stats.duration_sec &&
+      userTwoData.stats.distance_km &&
+      userTwoData.stats.calories_kcal;
+
+    if (isUsersData) {
+      usersData.push(userOneData);
+      usersData.push(userTwoData);
+    }
+
+    return {
+      compare: usersData,
     };
   }
 }

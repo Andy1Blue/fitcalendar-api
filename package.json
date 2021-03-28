@@ -8,6 +8,9 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
+    "docker-create": "docker-compose -f docker-compose.yml up -d --build",
+    "docker-log": "docker-compose logs -f fitcalendar_api",
+    "docker-build": "docker-compose up --build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",

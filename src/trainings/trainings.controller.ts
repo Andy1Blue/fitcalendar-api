@@ -269,49 +269,47 @@ export class TrainingsController {
     }
   }
 
-  // TODO
-  // @Get('/compare/user/:userId/to/:userIdToCompare/year/:year')
-  // async compareSumTraingsDataByYear(
-  //   @Param('userId') userId: string,
-  //   @Param('year') year: string,
-  //   @Param('userIdToCompare') userIdToCompare: string,
-  //   @Headers() headers: IHeader,
-  // ) {
-  //   if (await this.isUserAuthorization(headers)) {
-  //     const result = await this.trainingsService.compareSumTraingsDataByYear(
-  //       year,
-  //       {
-  //         userId,
-  //       },
-  //       userIdToCompare,
-  //     );
-  //     return result;
-  //   } else {
-  //     throw new BadRequestException('No authorisation');
-  //   }
-  // }
+  @Get('/compare/user/:userId/to/:userIdToCompare/year/:year')
+  async compareSumTraingsDataByYear(
+    @Param('userId') userId: string,
+    @Param('year') year: string,
+    @Param('userIdToCompare') userIdToCompare: string,
+    @Headers() headers: IHeader,
+  ) {
+    if (await this.isUserAuthorization(headers)) {
+      const result = await this.trainingsService.compareSumTraingsDataByYear(
+        year,
+        {
+          user_email: userId,
+        },
+        userIdToCompare,
+      );
+      return result;
+    } else {
+      throw new BadRequestException('No authorisation');
+    }
+  }
 
-  // TODO
-  // @Get('/compare/user/:userId/to/:userIdToCompare/year/:year/month/:month')
-  // async compareSumTraingsDataByMonth(
-  //   @Param('userId') userId: string,
-  //   @Param('year') year: string,
-  //   @Param('month') month: string,
-  //   @Param('userIdToCompare') userIdToCompare: string,
-  //   @Headers() headers: IHeader,
-  // ) {
-  //   if (await this.isUserAuthorization(headers)) {
-  //     const result = await this.trainingsService.compareSumTraingsDataByMonth(
-  //       month,
-  //       year,
-  //       {
-  //         userId,
-  //       },
-  //       userIdToCompare,
-  //     );
-  //     return result;
-  //   } else {
-  //     throw new BadRequestException('No authorisation');
-  //   }
-  // }
+  @Get('/compare/user/:userId/to/:userIdToCompare/year/:year/month/:month')
+  async compareSumTraingsDataByMonth(
+    @Param('userId') userId: string,
+    @Param('year') year: string,
+    @Param('month') month: string,
+    @Param('userIdToCompare') userIdToCompare: string,
+    @Headers() headers: IHeader,
+  ) {
+    if (await this.isUserAuthorization(headers)) {
+      const result = await this.trainingsService.compareSumTraingsDataByMonth(
+        month,
+        year,
+        {
+          user_email: userId,
+        },
+        userIdToCompare,
+      );
+      return result;
+    } else {
+      throw new BadRequestException('No authorisation');
+    }
+  }
 }
