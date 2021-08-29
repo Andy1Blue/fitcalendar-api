@@ -3,4 +3,4 @@ build:
     web: Dockerfile
 
 run:
-  web: ./fitcalendar-api
+  web: npm start
