@@ -16,23 +16,38 @@ Libraries and technologies used in the project:
 ## Installation
 
 ```bash
-$ cp .env.example .env && npm install
+cp .env.example .env && npm install
 ```
 
 ## Running the app
 
 ```bash
-$ npm run build && npm run start:prod
+npm run build && npm run start:prod
 ```
 
 ## Docker
 
+```bash
+docker-compose -f docker-compose.yml up -d --build
 ```
-$ docker-compose -f docker-compose.yml up -d --build
+
+## Heroku
+
+```bash
+heroku login
+heroku create
+git init
+git add . && git commit -m "Deploy to Heroku"
+heroku stack:set container -a fitcalendar-api
+heroku config:set PORT=3001 // add other configs from .env
+git push heroku master
+
+heroku open
+heroku logs --tail
 ```
 
 ## Test
 
 ```bash
-$ npm run test
+npm run test
 ```
