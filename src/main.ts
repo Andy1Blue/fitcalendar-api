@@ -15,13 +15,17 @@ async function bootstrap() {
   });
 
   if (process.env.MODE === 'PROD') {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const fs = require('fs');
-    const httpsOptions = {
-      key: fs.readFileSync(process.env.KEY_DIR),
-      cert: fs.readFileSync(process.env.CERT_DIR),
-      ca: fs.readFileSync(process.env.CA_DIR),
-    };
+    let httpsOptions = {};
+
+    if (process.env.USE_CERT_DIR === 'true') {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const fs = require('fs');
+      httpsOptions = {
+        key: fs.readFileSync(process.env.KEY_DIR),
+        cert: fs.readFileSync(process.env.CERT_DIR),
+        ca: fs.readFileSync(process.env.CA_DIR),
+      };
+    }
 
     app = await NestFactory.create<NestFastifyApplication>(
       AppModule,
@@ -32,7 +36,7 @@ async function bootstrap() {
     );
   }
 
-  const corsWhitelist = ['http://localhost:3000'];
+  const corsWhitelist = process.env.CORS_WHITELIST.split(',');
   const corsOptions = {
     origin: function (origin, callback) {
       if (corsWhitelist.indexOf(origin) !== -1) {

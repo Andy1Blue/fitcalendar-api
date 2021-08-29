@@ -4,7 +4,7 @@ WORKDIR /
 
 COPY . .
 
-RUN npm install --silent 
+RUN npm install --silent
 
 EXPOSE 3001
 
