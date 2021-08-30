@@ -39,7 +39,7 @@ heroku create
 git init
 git add . && git commit -m "Deploy to Heroku"
 heroku stack:set container -a fitcalendar-api
-heroku config:set PORT=3001 // add other configs from .env
+heroku config:set PORT=3001 # add other configs from .env
 git push heroku master
 
 heroku open
