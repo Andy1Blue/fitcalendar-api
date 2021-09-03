@@ -40,6 +40,7 @@ export class TrainingsService {
       start_time: training.start_time,
       end_time: training.end_time,
       duration_sec: training.duration_sec,
+      duration_move_sec: training.duration_move_sec,
       distance_km: training.distance_km,
       calories_kcal: training.calories_kcal,
       description: training.description,
@@ -52,6 +53,16 @@ export class TrainingsService {
       feeling: training.feeling,
       steps: training.steps,
       hydration_ml: training.hydration_ml,
+      elevation_max_m: training.elevation_max_m,
+      elevation_min_m: training.elevation_min_m,
+      elevation_gain_m: training.elevation_gain_m,
+      training_effect_aerobic: training.training_effect_aerobic,
+      training_effect_anaerobic: training.training_effect_anaerobic,
+      vo2max: training.vo2max,
+      pace_max_min_km: training.pace_max_min_km,
+      pace_avg_min_km: training.pace_avg_min_km,
+      cadence_max_spm: training.cadence_max_spm,
+      cadence_avg_spm: training.cadence_avg_spm,
     });
     const result = await newTraining.save();
     return result.id as string;
@@ -143,6 +154,10 @@ export class TrainingsService {
       updatedTraining.duration_sec = training.duration_sec;
     }
 
+    if (training.duration_move_sec >= 0) {
+      updatedTraining.duration_move_sec = training.duration_move_sec;
+    }
+
     if (training.distance_km >= 0) {
       updatedTraining.distance_km = training.distance_km;
     }
@@ -185,6 +200,46 @@ export class TrainingsService {
 
     if (training.speed_max_kmh) {
       updatedTraining.speed_max_kmh = training.speed_max_kmh;
+    }
+
+    if (training.elevation_max_m) {
+      updatedTraining.elevation_max_m = training.elevation_max_m;
+    }
+
+    if (training.elevation_min_m) {
+      updatedTraining.elevation_min_m = training.elevation_min_m;
+    }
+
+    if (training.elevation_gain_m) {
+      updatedTraining.elevation_gain_m = training.elevation_gain_m;
+    }
+
+    if (training.training_effect_aerobic) {
+      updatedTraining.training_effect_aerobic = training.training_effect_aerobic;
+    }
+
+    if (training.training_effect_anaerobic) {
+      updatedTraining.training_effect_anaerobic = training.training_effect_anaerobic;
+    }
+
+    if (training.vo2max) {
+      updatedTraining.vo2max = training.vo2max;
+    }
+
+    if (training.pace_max_min_km) {
+      updatedTraining.pace_max_min_km = training.pace_max_min_km;
+    }
+
+    if (training.pace_avg_min_km) {
+      updatedTraining.pace_avg_min_km = training.pace_avg_min_km;
+    }
+
+    if (training.cadence_max_spm) {
+      updatedTraining.cadence_max_spm = training.cadence_max_spm;
+    }
+
+    if (training.cadence_max_spm) {
+      updatedTraining.cadence_max_spm = training.cadence_max_spm;
     }
 
     if (training.points) {
