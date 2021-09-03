@@ -48,6 +48,10 @@ export class TrainingsService {
       speed_avg_kmh: training.speed_avg_kmh,
       speed_max_kmh: training.speed_max_kmh,
       points: training.points,
+      effort: training.effort,
+      feeling: training.feeling,
+      steps: training.steps,
+      hydration_ml: training.hydration_ml,
     });
     const result = await newTraining.save();
     return result.id as string;
@@ -153,6 +157,22 @@ export class TrainingsService {
 
     if (training.heart_rate_avg_bpm) {
       updatedTraining.heart_rate_avg_bpm = training.heart_rate_avg_bpm;
+    }
+
+    if (training.effort) {
+      updatedTraining.effort = training.effort;
+    }
+
+    if (training.feeling) {
+      updatedTraining.feeling = training.feeling;
+    }
+
+    if (training.steps) {
+      updatedTraining.steps = training.steps;
+    }
+
+    if (training.hydration_ml) {
+      updatedTraining.hydration_ml = training.hydration_ml;
     }
 
     if (training.heart_rate_max_bpm) {

@@ -56,4 +56,8 @@ export interface ITraining {
   speed_avg_kmh?: number;
   speed_max_kmh?: number;
   points?: Points[];
+  effort?: number;
+  feeling?: number;
+  steps?: number;
+  hydration_ml?: number;
 }

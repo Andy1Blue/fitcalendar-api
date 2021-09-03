@@ -5,7 +5,6 @@ import {
   Headers,
   Get,
   Param,
-  Patch,
   Delete,
   BadRequestException,
 } from '@nestjs/common';
@@ -53,6 +52,10 @@ export class TrainingsController {
     @Body('speedAvgKmh') speed_avg_kmh: number,
     @Body('speedMaxKmh') speed_max_kmh: number,
     @Body('points') points: Points[],
+    @Body('effort') effort: number,
+    @Body('feeling') feeling: number,
+    @Body('steps') steps: number,
+    @Body('hydrationMl') hydration_ml: number,
     @Headers() headers: IHeader,
   ) {
     const response = await this.oauthService.verifyToken(headers.token);
@@ -74,6 +77,10 @@ export class TrainingsController {
         speed_avg_kmh,
         speed_max_kmh,
         points,
+        effort,
+        feeling,
+        steps,
+        hydration_ml,
       });
       return { id: generatedId };
     } else {
@@ -99,6 +106,10 @@ export class TrainingsController {
     @Body('speedAvgKmh') speed_avg_kmh: number,
     @Body('speedMaxKmh') speed_max_kmh: number,
     @Body('points') points: Points[],
+    @Body('effort') effort: number,
+    @Body('feeling') feeling: number,
+    @Body('steps') steps: number,
+    @Body('hydrationMl') hydration_ml: number,
     @Headers() headers: IHeader,
   ) {
     if (await this.isUserAuthorization(headers)) {
@@ -119,6 +130,10 @@ export class TrainingsController {
         speed_avg_kmh,
         speed_max_kmh,
         points,
+        effort,
+        feeling,
+        steps,
+        hydration_ml,
       });
       return id;
     } else {

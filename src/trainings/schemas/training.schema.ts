@@ -20,6 +20,10 @@ export const TrainingSchema = new mongoose.Schema({
   speed_avg_kmh: Number,
   speed_max_kmh: Number,
   points: Object,
+  effort: Number,
+  feeling: Number,
+  steps: Number,
+  hydration_ml: Number,
 });
 
 export interface Training extends mongoose.Document {
@@ -41,4 +45,8 @@ export interface Training extends mongoose.Document {
   speed_avg_kmh?: number;
   speed_max_kmh?: number;
   points?: Points[];
+  effort?: number;
+  feeling?: number;
+  steps?: number;
+  hydration_ml: number;
 }
