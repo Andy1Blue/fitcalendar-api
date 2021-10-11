@@ -4,6 +4,8 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
+import { fastifyHelmet } from 'fastify-helmet';
+
 ConfigModule.forRoot({
   envFilePath: '.env',
   isGlobal: true,
@@ -36,6 +38,8 @@ async function bootstrap() {
     );
   }
 
+  app.useGlobalPipes(new ValidationPipe());
+
   const corsWhitelist = process.env.CORS_WHITELIST.split(',');
   const corsOptions = {
     origin: function (origin, callback) {
@@ -50,9 +54,25 @@ async function bootstrap() {
     methods: 'GET, PUT, POST, DELETE, UPDATE, OPTIONS',
     credentials: true,
   };
-
   app.enableCors(corsOptions);
-  app.useGlobalPipes(new ValidationPipe());
+
+  await app.register(fastifyHelmet, {
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: [`'self'`],
+        styleSrc: [`'self'`, `'unsafe-inline'`, 'fonts.googleapis.com'],
+        fontSrc: [`'self'`],
+        imgSrc: [`'self'`, 'data:'],
+        scriptSrc: [`'self'`, `https: 'unsafe-inline'`],
+      },
+      useDefaults: process.env.MODE !== 'PROD',
+    },
+  });
+
+  await app.register(fastifyHelmet, {
+    contentSecurityPolicy: false,
+  });
+
   const port = parseInt(process.env.PORT) || 3001;
   await app.listen(port, '0.0.0.0');
 }
