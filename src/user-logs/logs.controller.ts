@@ -40,7 +40,7 @@ export class LogsController {
       });
       return { id: generatedId };
     } else {
-      throw new BadRequestException('No authorisation');
+      throw new BadRequestException('No authorization');
     }
   }
 

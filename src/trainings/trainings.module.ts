@@ -16,5 +16,6 @@ import { WhitelistSchema } from 'src/whitelists/schemas/whitelist.schema';
   ],
   controllers: [TrainingsController],
   providers: [TrainingsService, WhitelistsService, OAuthService],
+  exports: [TrainingsService],
 })
 export class TrainingsModule {}

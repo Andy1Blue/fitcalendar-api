@@ -3,14 +3,13 @@ import { Training } from './schemas/training.schema';
 import { ITraining } from './interfaces/training.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import e = require('express');
 
 @Injectable()
 export class TrainingsService {
   constructor(@InjectModel('Training') private readonly trainingModel: Model<Training>) {}
 
   private async findTraining(training: ITraining): Promise<Training> {
-    let findTraining;
+    let findTraining: Training;
     try {
       findTraining = await this.trainingModel.findOne({
         user_email: training.user_email,
@@ -65,6 +64,7 @@ export class TrainingsService {
       cadence_avg_spm: training.cadence_avg_spm,
     });
     const result = await newTraining.save();
+
     return result.id as string;
   }
 
