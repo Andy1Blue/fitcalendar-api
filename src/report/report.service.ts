@@ -23,8 +23,9 @@ export class ReportService {
     const delimiter = ',';
 
     trainings.forEach((training) => {
-      mappedDataField.forEach(({ field }) => {
+      mappedDataField.forEach(({ field }, index) => {
         csv.push(`${parseData(training[field])}${delimiter}`);
+        header.push(`${parseData(mappedDataField[index].header)}${delimiter}`);
       });
 
       csv.push('\n');
