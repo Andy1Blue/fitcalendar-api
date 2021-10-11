@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TrainingsModule } from './trainings/trainings.module';
-import { LogsModule } from './userLogs/logs.module';
+import { LogsModule } from './user-logs/logs.module';
 import { WhitelistsModule } from './whitelists/whitelists.module';
 import { OAuthModule } from './oauth/oauth.module';
+import { ReportModule } from './report/report.module';
 
 const dbData =
   process.env.MONGOOSE_USER === null || process.env.MONGOOSE_USER === ''
@@ -22,6 +23,7 @@ const dbData =
     LogsModule,
     WhitelistsModule,
     OAuthModule,
+    ReportModule,
     MongooseModule.forRoot(dbData, {
       useNewUrlParser: true,
       useUnifiedTopology: true,

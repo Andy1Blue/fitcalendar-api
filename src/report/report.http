@@ -1,0 +1,7 @@
+###
+POST http://localhost:3001/report/generate-csv
+Content-Type: application/json
+
+{
+    "year": "all"
+}
