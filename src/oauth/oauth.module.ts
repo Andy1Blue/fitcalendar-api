@@ -7,5 +7,6 @@ import { OAuthService } from './oauth.service';
   imports: [WhitelistsModule],
   controllers: [OAuthController],
   providers: [OAuthService],
+  exports: [OAuthService],
 })
 export class OAuthModule {}
