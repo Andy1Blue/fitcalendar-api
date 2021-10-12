@@ -25,7 +25,10 @@ export class ReportService {
     trainings.forEach((training) => {
       mappedDataField.forEach(({ field }, index) => {
         csv.push(`${parseData(training[field])}${delimiter}`);
-        header.push(`${parseData(mappedDataField[index].header)}${delimiter}`);
+
+        if (index < mappedDataField.length) {
+          header.push(`${parseData(mappedDataField[index].header)}${delimiter}`);
+        }
       });
 
       csv.push('\n');
