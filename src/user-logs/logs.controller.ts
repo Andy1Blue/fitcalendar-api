@@ -3,9 +3,9 @@ import {
   Post,
   Body,
   Headers,
-  Get,
-  Param,
-  Delete,
+  // Get,
+  // Param,
+  // Delete,
   BadRequestException,
 } from '@nestjs/common';
 import { OAuthService } from 'src/oauth/oauth.service';
