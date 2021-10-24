@@ -19,7 +19,6 @@ export class ReportService {
       { header: 'Update date', field: 'update_date' },
       { header: 'Tag color', field: 'tag_color' },
       { header: 'Source', field: 'source' },
-      { header: 'Id', field: 'id' },
       { header: 'Email', field: 'user_email' },
       { header: 'Date (start)', field: 'start_time' },
       { header: 'Date (end)', field: 'end_time' },
