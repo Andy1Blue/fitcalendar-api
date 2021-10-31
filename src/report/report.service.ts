@@ -15,9 +15,9 @@ export class ReportService {
     type TrainingField = keyof ITraining;
 
     const mappedDataField: { header: string; field: TrainingField }[] = [
-      { header: 'Created date', field: 'created_date' },
-      { header: 'Update date', field: 'update_date' },
-      { header: 'Tag color', field: 'tag_color' },
+      // { header: 'Created date', field: 'created_date' },
+      // { header: 'Update date', field: 'update_date' },
+      // { header: 'Tag color', field: 'tag_color' },
       { header: 'Source', field: 'source' },
       { header: 'Email', field: 'user_email' },
       { header: 'Date (start)', field: 'start_time' },
@@ -64,8 +64,8 @@ export class ReportService {
       csv.push('\n');
     });
 
-    csv.unshift(...header, '\n');
-
+    csv.unshift(...new Set(header), '\n');
+    console.log(csv.join(' '));
     return csv.join(' ');
   }
 }
