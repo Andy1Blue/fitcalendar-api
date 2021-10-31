@@ -253,7 +253,8 @@ export class TrainingsService {
     const result = await this.trainingModel
       .deleteOne({ user_email: training.user_email, _id: training.id })
       .exec();
-    if (result.n === 0) {
+
+    if (result.deletedCount === 0) {
       throw new NotFoundException('Could not find training.');
     }
   }
