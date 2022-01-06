@@ -49,7 +49,7 @@ export class ReportService {
     ];
 
     const csv = [];
-    const header = [];
+    const headers = [];
     const delimiter = ',';
 
     trainings.forEach((training) => {
@@ -57,15 +57,15 @@ export class ReportService {
         csv.push(`${parseData(training[field as string])}${delimiter}`);
 
         if (index < mappedDataField.length) {
-          header.push(`${parseData(mappedDataField[index].header)}${delimiter}`);
+          headers.push(`${parseData(mappedDataField[index].header)}${delimiter}`);
         }
       });
 
       csv.push('\n');
     });
 
-    csv.unshift(...new Set(header), '\n');
-    console.log(csv.join(' '));
+    csv.unshift(...new Set(headers), '\n');
+
     return csv.join(' ');
   }
 }

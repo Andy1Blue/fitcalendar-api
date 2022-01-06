@@ -68,7 +68,7 @@ export class TrainingsService {
     return result.id as string;
   }
 
-  // async getTranings() {
+  // async getTrainings() {
   //   const result = await this.trainingModel.find().exec();
   //   return result as Training[];
   // }
@@ -313,7 +313,7 @@ export class TrainingsService {
     return theLargestAmountOfCalories as Training[];
   }
 
-  async sumTraingsDataByYear(year: string, training: ITraining) {
+  async sumTrainingsDataByYear(year: string, training: ITraining) {
     let count = 0;
 
     this.trainingModel.countDocuments(
@@ -380,7 +380,7 @@ export class TrainingsService {
     };
   }
 
-  async sumTraingsDataByMonth(year: string, month: string, training: ITraining) {
+  async sumTrainingsDataByMonth(year: string, month: string, training: ITraining) {
     let count = 0;
 
     this.trainingModel.countDocuments(
@@ -447,7 +447,7 @@ export class TrainingsService {
     };
   }
 
-  async compareSumTraingsDataByYear(
+  async compareSumTrainingsDataByYear(
     year: string,
     training: ITraining,
     user_emailToCompare: string,
@@ -613,7 +613,7 @@ export class TrainingsService {
     };
   }
 
-  async compareSumTraingsDataByMonth(
+  async compareSumTrainingsDataByMonth(
     month: string,
     year: string,
     training: ITraining,

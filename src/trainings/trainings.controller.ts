@@ -181,7 +181,7 @@ export class TrainingsController {
       });
       return id;
     } else {
-      throw new BadRequestException('No authorisation');
+      throw new BadRequestException('No authorization');
     }
   }
 
@@ -193,26 +193,26 @@ export class TrainingsController {
       await this.trainingsService.deleteTraining({ user_email: response.payload.email, id });
       return id;
     } else {
-      throw new BadRequestException('No authorisation');
+      throw new BadRequestException('No authorization');
     }
   }
 
   @Get('/user/')
-  async getTranings(@Headers() headers: IHeader) {
+  async getTrainings(@Headers() headers: IHeader) {
     const response = await this.oauthService.verifyToken(headers.token);
 
     if (response.isVerified) {
-      const userTranings = await this.trainingsService.getTrainingsForUser({
+      const userTrainings = await this.trainingsService.getTrainingsForUser({
         user_email: response.payload.email,
       });
-      return userTranings;
+      return userTrainings;
     } else {
-      throw new BadRequestException('No authentication');
+      throw new BadRequestException('No authorization');
     }
   }
 
   @Get('/user/id/:id')
-  async getTraning(@Param('id') id: string, @Headers() headers: IHeader) {
+  async getTraining(@Param('id') id: string, @Headers() headers: IHeader) {
     const response = await this.oauthService.verifyToken(headers.token);
 
     if (response.isVerified) {
@@ -222,12 +222,12 @@ export class TrainingsController {
       });
       return training;
     } else {
-      throw new BadRequestException('No authorisation');
+      throw new BadRequestException('No authorization');
     }
   }
 
   @Get('/user/first/')
-  async getFirstTraning(@Headers() headers: IHeader) {
+  async getFirstTraining(@Headers() headers: IHeader) {
     const response = await this.oauthService.verifyToken(headers.token);
 
     if (response.isVerified) {
@@ -236,12 +236,12 @@ export class TrainingsController {
       });
       return training;
     } else {
-      throw new BadRequestException('No authorisation');
+      throw new BadRequestException('No authorization');
     }
   }
 
   @Get('/user/last/')
-  async getLastTraning(@Headers() headers: IHeader) {
+  async getLastTraining(@Headers() headers: IHeader) {
     const response = await this.oauthService.verifyToken(headers.token);
 
     if (response.isVerified) {
@@ -250,7 +250,7 @@ export class TrainingsController {
       });
       return training;
     } else {
-      throw new BadRequestException('No authorisation');
+      throw new BadRequestException('No authorization');
     }
   }
 
@@ -264,7 +264,7 @@ export class TrainingsController {
       });
       return training;
     } else {
-      throw new BadRequestException('No authorisation');
+      throw new BadRequestException('No authorization');
     }
   }
 
@@ -278,7 +278,7 @@ export class TrainingsController {
       });
       return training;
     } else {
-      throw new BadRequestException('No authorisation');
+      throw new BadRequestException('No authorization');
     }
   }
 
@@ -297,11 +297,11 @@ export class TrainingsController {
   }
 
   @Get('/user/sum/year/:year')
-  async getSumTraningDataByYear(@Param('year') year: string, @Headers() headers: IHeader) {
+  async getSumTrainingDataByYear(@Param('year') year: string, @Headers() headers: IHeader) {
     const response = await this.oauthService.verifyToken(headers.token);
 
     if (response.isVerified) {
-      const result = await this.trainingsService.sumTraingsDataByYear(year, {
+      const result = await this.trainingsService.sumTrainingsDataByYear(year, {
         user_email: response.payload.email,
       });
       return result;
@@ -311,7 +311,7 @@ export class TrainingsController {
   }
 
   @Get('/user/sum/year/:year/month/:month')
-  async getSumTraningDataByMonth(
+  async getSumTrainingDataByMonth(
     @Param('year') year: string,
     @Param('month') month: string,
     @Headers() headers: IHeader,
@@ -319,7 +319,7 @@ export class TrainingsController {
     const response = await this.oauthService.verifyToken(headers.token);
 
     if (response.isVerified) {
-      const result = await this.trainingsService.sumTraingsDataByMonth(year, month, {
+      const result = await this.trainingsService.sumTrainingsDataByMonth(year, month, {
         user_email: response.payload.email,
       });
       return result;
@@ -329,14 +329,14 @@ export class TrainingsController {
   }
 
   @Get('/compare/user/:userId/to/:userIdToCompare/year/:year')
-  async compareSumTraingsDataByYear(
+  async compareSumTrainingsDataByYear(
     @Param('userId') userId: string,
     @Param('year') year: string,
     @Param('userIdToCompare') userIdToCompare: string,
     @Headers() headers: IHeader,
   ) {
     if (await this.isUserAuthorization(headers)) {
-      const result = await this.trainingsService.compareSumTraingsDataByYear(
+      const result = await this.trainingsService.compareSumTrainingsDataByYear(
         year,
         {
           user_email: userId,
@@ -350,7 +350,7 @@ export class TrainingsController {
   }
 
   @Get('/compare/user/:userId/to/:userIdToCompare/year/:year/month/:month')
-  async compareSumTraingsDataByMonth(
+  async compareSumTrainingsDataByMonth(
     @Param('userId') userId: string,
     @Param('year') year: string,
     @Param('month') month: string,
@@ -358,7 +358,7 @@ export class TrainingsController {
     @Headers() headers: IHeader,
   ) {
     if (await this.isUserAuthorization(headers)) {
-      const result = await this.trainingsService.compareSumTraingsDataByMonth(
+      const result = await this.trainingsService.compareSumTrainingsDataByMonth(
         month,
         year,
         {
