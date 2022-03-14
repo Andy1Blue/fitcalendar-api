@@ -40,6 +40,7 @@ git init
 git add . && git commit -m "Deploy to Heroku"
 heroku stack:set container -a fitcalendar-api
 heroku config:set PORT=3001 # add other configs from .env
+heroku config:set NODE_OPTIONS="--max_old_space_size=2560" -a [app_name]
 git push heroku master
 
 heroku open
