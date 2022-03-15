@@ -17,25 +17,23 @@ async function bootstrap() {
   });
 
   if (process.env.MODE === 'PROD') {
-    let httpsOptions = {};
+    let options = {};
 
     if (process.env.USE_CERT_DIR === 'true') {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const fs = require('fs');
-      httpsOptions = {
-        key: fs.readFileSync(process.env.KEY_DIR),
-        cert: fs.readFileSync(process.env.CERT_DIR),
-        ca: fs.readFileSync(process.env.CA_DIR),
+      options = {
+        https: {
+          key: fs.readFileSync(process.env.KEY_DIR),
+          cert: fs.readFileSync(process.env.CERT_DIR),
+          ca: fs.readFileSync(process.env.CA_DIR),
+        },
       };
     }
 
-    app = await NestFactory.create<NestFastifyApplication>(
-      AppModule,
-      new FastifyAdapter({ https: httpsOptions }),
-      {
-        logger: console,
-      },
-    );
+    app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(options), {
+      logger: console,
+    });
   }
 
   app.useGlobalPipes(new ValidationPipe());
