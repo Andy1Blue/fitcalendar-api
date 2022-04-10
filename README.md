@@ -5,6 +5,7 @@
 ## Description
 
 Backend (API) of FitCalendar project.
+Frontend: https://github.com/Andy1Blue/fitcalendar-www
 
 ## Technologies and libraries
 
