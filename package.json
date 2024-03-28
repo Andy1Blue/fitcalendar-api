@@ -28,7 +28,7 @@
     "@nestjs/config": "^1.0.3",
     "@nestjs/core": "^9.0.5",
     "@nestjs/mongoose": "^9.0.1",
-    "@nestjs/platform-express": "^8.4.7",
+    "@nestjs/platform-express": "^10.3.7",
     "@nestjs/platform-fastify": "^9.2.1",
     "@types/mongoose": "^5.11.97",
     "class-transformer": "^0.3.1",
